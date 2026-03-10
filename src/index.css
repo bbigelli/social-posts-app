@@ -1,0 +1,77 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply antialiased;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 
+           transition-all duration-200 transform hover:scale-105 
+           focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50
+           disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100;
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 
+           rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 
+           transition-all duration-200 transform hover:scale-105
+           focus:outline-none focus:ring-2 focus:ring-gray-500;
+  }
+
+  .btn-danger {
+    @apply px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 
+           transition-all duration-200 transform hover:scale-105
+           focus:outline-none focus:ring-2 focus:ring-red-500;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-2 border border-gray-300 dark:border-gray-600 
+           rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent
+           bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100
+           transition-colors duration-200;
+  }
+
+  .modal-overlay {
+    @apply fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm
+           flex items-center justify-center z-50
+           animate-fade-in;
+  }
+
+  .modal-content {
+    @apply bg-white dark:bg-gray-800 rounded-xl p-6 max-w-md w-full mx-4
+           shadow-2xl transform animate-slide-down;
+  }
+
+  .card {
+    @apply bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg
+           hover:shadow-xl transition-all duration-300
+           border border-gray-100 dark:border-gray-700;
+  }
+
+  .post-card {
+    @apply card hover:transform hover:-translate-y-1 cursor-pointer;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100 dark:bg-gray-800;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-400 dark:bg-gray-600 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-500 dark:bg-gray-500;
+}
