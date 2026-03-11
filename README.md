@@ -4,6 +4,9 @@ Uma aplicação social completa desenvolvida com React, oferecendo funcionalidad
 
 ---
 
+# Link do deploy
+social-posts-complete-app.vercel.app
+
 ## 🎯 Sobre o Projeto
 
 O Social Posts App é uma aplicação web que simula uma rede social, permitindo que usuários criem posts, interajam com conteúdo de outros usuários através de likes e comentários, e experimentem uma experiência rica com features avançadas como menções, modo offline e atualizações em tempo real.
