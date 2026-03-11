@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiSend, FiMoreVertical, FiEdit2, FiTrash2, FiUser } from 'react-icons/fi';
+import { FiSend, FiMoreVertical, FiEdit2, FiTrash2 } from 'react-icons/fi';
 import { formatDate } from '../../utils/helpers';
 
 const CommentSection = ({ 
@@ -17,7 +17,6 @@ const CommentSection = ({
   const [editText, setEditText] = useState('');
   const [showMenuFor, setShowMenuFor] = useState(null);
 
-  // Handle comment submission
   const handleSubmitComment = (e) => {
     e.preventDefault();
     if (!newComment.trim()) return;
@@ -25,7 +24,6 @@ const CommentSection = ({
     setNewComment('');
   };
 
-  // Handle edit submission
   const handleEditSubmit = (commentId) => {
     if (!editText.trim()) return;
     onUpdateComment(postId, commentId, editText);
@@ -33,26 +31,11 @@ const CommentSection = ({
     setEditText('');
   };
 
-  // Start editing a comment
   const startEditing = (comment) => {
     setEditingComment(comment.id);
     setEditText(comment.text);
     setShowMenuFor(null);
   };
-
-  // Sample comments in English
-  const sampleComments = [
-    "Great post! Very informative.",
-    "Thanks for sharing this!",
-    "This really helped me understand the topic.",
-    "Awesome content, keep it up!",
-    "I learned something new today.",
-    "Could you make a video about this?",
-    "Best explanation I've seen so far.",
-    "This deserves more attention.",
-    "Simple and clear, perfect!",
-    "Looking forward to more posts like this."
-  ];
 
   return (
     <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
@@ -60,7 +43,6 @@ const CommentSection = ({
         Comments ({comments.length})
       </h4>
 
-      {/* Comments list */}
       <div className="space-y-3 mb-4 max-h-60 overflow-y-auto pr-2">
         <AnimatePresence>
           {comments.map((comment) => (
@@ -72,7 +54,6 @@ const CommentSection = ({
               className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 relative group"
             >
               {editingComment === comment.id ? (
-                // Edit mode
                 <div className="space-y-2">
                   <textarea
                     value={editText}
@@ -97,7 +78,6 @@ const CommentSection = ({
                   </div>
                 </div>
               ) : (
-                // View mode
                 <>
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-2">
@@ -115,7 +95,6 @@ const CommentSection = ({
                       </div>
                     </div>
 
-                    {/* Comment options menu (only for own comments) */}
                     {currentUser?.id === comment.userId?.toString() && (
                       <div className="relative">
                         <button
@@ -171,7 +150,6 @@ const CommentSection = ({
         </AnimatePresence>
       </div>
 
-      {/* New comment form */}
       {currentUser && (
         <form onSubmit={handleSubmitComment} className="flex gap-2">
           <input

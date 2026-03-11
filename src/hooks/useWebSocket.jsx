@@ -1,7 +1,3 @@
-/**
- * Custom hook for WebSocket real-time updates
- * Hook personalizado para atualizações em tempo real via WebSocket
- */
 import { useState, useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
 
@@ -11,14 +7,9 @@ export const useWebSocket = (url) => {
   const wsRef = useRef(null);
 
   useEffect(() => {
-    // Simulate WebSocket connection (since it's frontend only)
-    // Na vida real, seria: wsRef.current = new WebSocket(url);
-    
-    // Simulate connection
     setIsConnected(true);
     toast.success('🔌 Connected to real-time updates!');
 
-    // Simulate receiving messages every 30 seconds
     const interval = setInterval(() => {
       const mockMessage = {
         id: Date.now(),
@@ -27,7 +18,6 @@ export const useWebSocket = (url) => {
         timestamp: new Date().toISOString()
       };
       
-      // Custom notification using JSX
       toast.custom((t) => (
         <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-xl 
                       border-l-4 border-green-500 animate-slide-up">
@@ -50,7 +40,6 @@ export const useWebSocket = (url) => {
       setMessages(prev => [mockMessage, ...prev]);
     }, 30000);
 
-    // Cleanup on unmount
     return () => {
       clearInterval(interval);
       if (wsRef.current) {

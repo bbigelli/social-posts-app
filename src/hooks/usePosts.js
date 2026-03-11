@@ -1,7 +1,3 @@
-/**
- * Custom hook for posts management
- * Hook personalizado para gerenciamento de posts
- */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '../services/api';
 import toast from 'react-hot-toast';
@@ -11,14 +7,12 @@ export const usePosts = (currentUser, sortBy = 'newest') => {
   const queryClient = useQueryClient();
   const [likedPosts, setLikedPosts] = useState(new Set());
 
-  // Fetch posts / Buscar posts
   const { data: posts = [], isLoading, error } = useQuery({
     queryKey: ['posts'],
     queryFn: () => api.getPosts(),
     staleTime: 10000,
   });
 
-  // Create post mutation / Mutação para criar post
   const createPostMutation = useMutation({
     mutationFn: (data) => api.createPost(data),
     onSuccess: () => {
@@ -31,7 +25,6 @@ export const usePosts = (currentUser, sortBy = 'newest') => {
     },
   });
 
-  // Update post mutation / Mutação para atualizar post
   const updatePostMutation = useMutation({
     mutationFn: ({ id, data }) => api.updatePost(id, data),
     onSuccess: () => {
@@ -44,24 +37,22 @@ export const usePosts = (currentUser, sortBy = 'newest') => {
     },
   });
 
-  // Delete post mutation / Mutação para deletar post - CORRIGIDO
   const deletePostMutation = useMutation({
     mutationFn: (id) => {
-      console.log('Deleting post with ID:', id); // Debug log
+      console.log('Deleting post with ID:', id);
       return api.deletePost(id);
     },
     onSuccess: (data, variables) => {
-      console.log('Post deleted successfully:', variables); // Debug log
+      console.log('Post deleted successfully:', variables);
       queryClient.invalidateQueries(['posts']);
       toast.success('Post deleted successfully!');
     },
     onError: (error, variables) => {
-      console.error('Delete post error:', error, 'Post ID:', variables); // Debug log
+      console.error('Delete post error:', error, 'Post ID:', variables);
       toast.error('Failed to delete post');
     },
   });
 
-  // Add comment mutation / Mutação para adicionar comentário
   const addCommentMutation = useMutation({
     mutationFn: ({ postId, text }) => api.addComment(postId, {
       text,
@@ -78,7 +69,6 @@ export const usePosts = (currentUser, sortBy = 'newest') => {
     },
   });
 
-  // Delete comment mutation / Mutação para deletar comentário
   const deleteCommentMutation = useMutation({
     mutationFn: ({ postId, commentId }) => api.deleteComment(postId, commentId),
     onSuccess: () => {
@@ -91,7 +81,6 @@ export const usePosts = (currentUser, sortBy = 'newest') => {
     },
   });
 
-  // Update comment mutation / Mutação para atualizar comentário
   const updateCommentMutation = useMutation({
     mutationFn: ({ postId, commentId, text }) => api.updateComment(postId, commentId, text),
     onSuccess: () => {
@@ -104,7 +93,6 @@ export const usePosts = (currentUser, sortBy = 'newest') => {
     },
   });
 
-  // Toggle like / Alternar like
   const toggleLike = (postId) => {
     setLikedPosts(prev => {
       const newSet = new Set(prev);
@@ -117,7 +105,6 @@ export const usePosts = (currentUser, sortBy = 'newest') => {
     });
   };
 
-  // Create post wrapper / Wrapper para criar post
   const createPost = (data) => {
     if (!currentUser) {
       toast.error('Please sign in to create a post');
@@ -126,7 +113,6 @@ export const usePosts = (currentUser, sortBy = 'newest') => {
     createPostMutation.mutate({ ...data, userId: currentUser.id });
   };
 
-  // Update post wrapper / Wrapper para atualizar post
   const updatePost = (id, data) => {
     if (!currentUser) {
       toast.error('Please sign in to update posts');
@@ -135,9 +121,8 @@ export const usePosts = (currentUser, sortBy = 'newest') => {
     updatePostMutation.mutate({ id, data });
   };
 
-  // Delete post wrapper / Wrapper para deletar post - CORRIGIDO
   const deletePost = (id) => {
-    console.log('Delete post called with ID:', id); // Debug log
+    console.log('Delete post called with ID:', id);
     
     if (!currentUser) {
       toast.error('Please sign in to delete posts');
@@ -153,7 +138,6 @@ export const usePosts = (currentUser, sortBy = 'newest') => {
     deletePostMutation.mutate(id);
   };
 
-  // Add comment wrapper / Wrapper para adicionar comentário
   const addComment = (postId, text) => {
     if (!currentUser) {
       toast.error('Please sign in to comment');
@@ -166,7 +150,6 @@ export const usePosts = (currentUser, sortBy = 'newest') => {
     addCommentMutation.mutate({ postId, text });
   };
 
-  // Delete comment wrapper / Wrapper para deletar comentário
   const deleteComment = (postId, commentId) => {
     if (!currentUser) {
       toast.error('Please sign in to delete comments');
@@ -175,7 +158,6 @@ export const usePosts = (currentUser, sortBy = 'newest') => {
     deleteCommentMutation.mutate({ postId, commentId });
   };
 
-  // Update comment wrapper / Wrapper para atualizar comentário
   const updateComment = (postId, commentId, text) => {
     if (!currentUser) {
       toast.error('Please sign in to edit comments');
@@ -188,7 +170,6 @@ export const usePosts = (currentUser, sortBy = 'newest') => {
     updateCommentMutation.mutate({ postId, commentId, text });
   };
 
-  // Sort and filter posts / Ordenar e filtrar posts
   const sortedAndFilteredPosts = useMemo(() => {
     let filtered = [...posts];
     

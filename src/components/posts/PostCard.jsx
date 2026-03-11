@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   FiHeart, 
@@ -36,7 +36,6 @@ const PostCard = ({
   
   const isOwnPost = user?.id === post.userId?.toString();
 
-  // Handle double-click to like
   const handleDoubleClick = () => {
     if (!user) {
       toast.error('Please sign in to like posts');
@@ -57,33 +56,30 @@ const PostCard = ({
     });
   };
 
-  // Handle menu click
   const handleMenuClick = (e) => {
     e.stopPropagation();
     setShowMenu(!showMenu);
   };
 
-  // Handle edit
   const handleEdit = (e) => {
     e.stopPropagation();
     onEdit(post);
     setShowMenu(false);
   };
 
-  // Handle delete
   const handleDelete = (e) => {
+    e.preventDefault();
     e.stopPropagation();
+    console.log('Delete button clicked for post:', post.id);
     onDelete(post.id);
     setShowMenu(false);
   };
 
-  // Handle comments click - toggle comments and expand post
   const handleCommentsClick = (e) => {
     e.stopPropagation();
     setShowComments(!showComments);
-    setIsExpanded(!showComments); // Expand when opening comments
+    setIsExpanded(!showComments);
     
-    // Scroll post into view with smooth animation
     setTimeout(() => {
       if (cardRef.current) {
         cardRef.current.scrollIntoView({ 
@@ -95,7 +91,6 @@ const PostCard = ({
     }, 100);
   };
 
-  // Handle like button click
   const handleLikeClick = (e) => {
     e.stopPropagation();
     if (!user) {
@@ -108,15 +103,12 @@ const PostCard = ({
     onLike(post.id);
   };
 
-  // Handle expand/collapse
   const handleExpandClick = (e) => {
     e.stopPropagation();
     setIsExpanded(!isExpanded);
   };
 
-  // Notify parent when comments section expands/collapses
   useEffect(() => {
-    // This could be used to update the virtualizer if needed
     if (cardRef.current) {
       const event = new CustomEvent('post-expand', { 
         detail: { postId: post.id, expanded: showComments } 
@@ -140,7 +132,6 @@ const PostCard = ({
         transition: 'transform 0.3s ease, box-shadow 0.3s ease'
       }}
     >
-      {/* Heart effect on double-click */}
       <AnimatePresence>
         {isLikedLocal && (
           <motion.div
@@ -155,10 +146,8 @@ const PostCard = ({
         )}
       </AnimatePresence>
 
-      {/* Header */}
       <div className="flex items-start justify-between mb-4 relative z-20">
         <div className="flex items-center gap-3">
-          {/* Avatar with gradient */}
           <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 
                         flex items-center justify-center text-white font-bold text-lg
                         shadow-lg transform hover:scale-110 transition-transform duration-200">
@@ -192,7 +181,6 @@ const PostCard = ({
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Expand/Collapse button */}
           <button
             onClick={handleExpandClick}
             className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full 
@@ -206,7 +194,6 @@ const PostCard = ({
             )}
           </button>
 
-          {/* Options menu (only for user's own posts) */}
           {isOwnPost && (
             <div className="relative">
               <button
@@ -219,7 +206,6 @@ const PostCard = ({
                 <FiMoreVertical className="w-5 h-5 text-gray-500 dark:text-gray-400" />
               </button>
 
-              {/* Dropdown menu */}
               <AnimatePresence>
                 {showMenu && (
                   <motion.div
@@ -257,7 +243,6 @@ const PostCard = ({
         </div>
       </div>
 
-      {/* Content - Always fully visible */}
       <div className="mb-4 relative z-20">
         <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2 
                      hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
@@ -268,7 +253,6 @@ const PostCard = ({
         </p>
       </div>
 
-      {/* Media (image) - Always fully visible */}
       {post.media && (
         <div className="mb-4 rounded-lg overflow-hidden relative z-20">
           {!imageLoaded && (
@@ -289,9 +273,7 @@ const PostCard = ({
         </div>
       )}
 
-      {/* Action buttons - Always visible */}
       <div className="flex items-center gap-4 pt-4 border-t border-gray-100 dark:border-gray-700 relative z-20">
-        {/* Like button */}
         <motion.button
           whileTap={{ scale: 0.9 }}
           whileHover={{ scale: 1.1 }}
@@ -307,7 +289,6 @@ const PostCard = ({
           <span className="text-sm font-medium">{localLikes}</span>
         </motion.button>
 
-        {/* Comments button */}
         <motion.button
           whileTap={{ scale: 0.9 }}
           whileHover={{ scale: 1.1 }}
@@ -324,7 +305,6 @@ const PostCard = ({
         </motion.button>
       </div>
 
-      {/* Comments section - Expands post height */}
       <AnimatePresence>
         {showComments && (
           <motion.div
@@ -349,7 +329,6 @@ const PostCard = ({
         )}
       </AnimatePresence>
 
-      {/* Double-click hint (appears only once) */}
       {!localStorage.getItem('double-click-hint-shown') && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}

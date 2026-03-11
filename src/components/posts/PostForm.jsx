@@ -66,7 +66,6 @@ const PostForm = ({ onSubmit, isSubmitting }) => {
           disabled={isSubmitting}
         />
 
-        {/* Media attachment preview */}
         {mediaPreview && (
           <div className="relative inline-block">
             <img 

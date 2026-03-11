@@ -10,7 +10,6 @@ const MentionInput = ({ onPost, placeholder = "Write something... @ to mention" 
   const inputRef = useRef();
   const mentionsRef = useRef();
 
-  // Mock users for mentions
   const mockUsers = [
     { id: 1, username: 'john_doe', avatar: 'J', fullName: 'John Doe' },
     { id: 2, username: 'jane_smith', avatar: 'J', fullName: 'Jane Smith' },
@@ -20,14 +19,12 @@ const MentionInput = ({ onPost, placeholder = "Write something... @ to mention" 
     { id: 6, username: 'emma_watson', avatar: 'E', fullName: 'Emma Watson' },
   ];
 
-  // Handle input changes and detect mentions
   const handleInput = (e) => {
     const value = e.target.value;
     const position = e.target.selectionStart;
     setContent(value);
     setCursorPosition(position);
 
-    // Detect @ for mentions
     const textBeforeCursor = value.slice(0, position);
     const lastAtIndex = textBeforeCursor.lastIndexOf('@');
     
@@ -40,7 +37,6 @@ const MentionInput = ({ onPost, placeholder = "Write something... @ to mention" 
     }
   };
 
-  // Insert selected mention into text
   const insertMention = (user) => {
     const beforeMention = content.slice(0, cursorPosition);
     const afterMention = content.slice(cursorPosition);
@@ -55,14 +51,12 @@ const MentionInput = ({ onPost, placeholder = "Write something... @ to mention" 
     inputRef.current.focus();
   };
 
-  // Handle post submission
   const handleSubmit = () => {
     if (!content.trim()) {
       toast.error('Please write something');
       return;
     }
     
-    // Extract mentions from content
     const mentions = content.match(/@(\w+)/g) || [];
     const mentionedUsers = mentions.map(m => m.slice(1));
     
@@ -77,7 +71,6 @@ const MentionInput = ({ onPost, placeholder = "Write something... @ to mention" 
     toast.success('Posted with mentions!');
   };
 
-  // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (mentionsRef.current && !mentionsRef.current.contains(event.target)) {
@@ -89,7 +82,6 @@ const MentionInput = ({ onPost, placeholder = "Write something... @ to mention" 
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Filter users based on search
   const filteredUsers = mockUsers.filter(u => 
     u.username.toLowerCase().includes(mentionSearch.toLowerCase()) ||
     u.fullName.toLowerCase().includes(mentionSearch.toLowerCase())

@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'react-hot-toast';
-import { AnimatePresence } from 'framer-motion';
 
+import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { useAuth } from './hooks/useAuth';
 import { usePosts } from './hooks/usePosts';
@@ -35,7 +35,7 @@ const queryClient = new QueryClient({
 });
 
 function AppContent() {
-  const { user, isLoading: authLoading } = useAuth();
+  const { user, isLoading: authLoading, isAuthenticated } = useAuth();
   const isMobile = useMediaQuery('(max-width: 640px)');
   
   const [sortBy, setSortBy] = useState('newest');
@@ -44,8 +44,13 @@ function AppContent() {
   const [selectedPost, setSelectedPost] = useState(null);
   const [showMentionInput, setShowMentionInput] = useState(false);
   const [onlineStatus, setOnlineStatus] = useState(navigator.onLine);
-  const [expandedComments, setExpandedComments] = useState({}); // Track expanded comments per post
+  const [expandedComments, setExpandedComments] = useState({});
   
+  useEffect(() => {
+    console.log('App - User:', user);
+    console.log('App - Is authenticated:', isAuthenticated);
+  }, [user, isAuthenticated]);
+
   const {
     posts,
     isLoading: postsLoading,
@@ -63,7 +68,6 @@ function AppContent() {
     isAddingComment,
   } = usePosts(user, sortBy);
 
-  // Listen for post expand events
   useEffect(() => {
     const handlePostExpand = (event) => {
       const { postId, expanded } = event.detail;
@@ -77,13 +81,10 @@ function AppContent() {
     return () => window.removeEventListener('post-expand', handlePostExpand);
   }, []);
 
-  // Keyboard navigation
   const { selectedIndex } = useKeyboardNavigation(posts, (post) => {
-    // Scroll to selected post
     const element = document.getElementById(`post-${post.id}`);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      // Highlight effect
       element.classList.add('ring-2', 'ring-blue-500', 'ring-opacity-50');
       setTimeout(() => {
         element.classList.remove('ring-2', 'ring-blue-500', 'ring-opacity-50');
@@ -91,10 +92,8 @@ function AppContent() {
     }
   });
 
-  // WebSocket for real-time updates
   const { messages: realtimeMessages, isConnected } = useWebSocket('wss://demo.piesocket.com/v3/channel_1');
 
-  // Monitor online/offline status
   useEffect(() => {
     const handleOnline = () => {
       setOnlineStatus(true);
@@ -114,9 +113,8 @@ function AppContent() {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
-  }, [queryClient]);
+  }, []);
 
-  // Mostrar hint de double-click apenas uma vez
   useEffect(() => {
     if (!localStorage.getItem('double-click-hint-shown')) {
       setTimeout(() => {
@@ -131,33 +129,58 @@ function AppContent() {
   };
 
   const handleDelete = (postId) => {
-    setSelectedPost({ id: postId });
-    setDeleteModalOpen(true);
+    console.log('handleDelete called with postId:', postId);
+    const postToDelete = posts.find(p => p.id === postId);
+    console.log('Post to delete:', postToDelete);
+    
+    if (postToDelete) {
+      setSelectedPost(postToDelete);
+      setDeleteModalOpen(true);
+    } else {
+      console.error('Post not found with ID:', postId);
+      toast.error('Post not found');
+    }
   };
 
   const handleConfirmDelete = async () => {
-    await deletePost(selectedPost.id);
-    setDeleteModalOpen(false);
-    setSelectedPost(null);
+    console.log('handleConfirmDelete called with selectedPost:', selectedPost);
+    
+    if (!selectedPost || !selectedPost.id) {
+      console.error('No post selected for deletion');
+      toast.error('No post selected');
+      setDeleteModalOpen(false);
+      setSelectedPost(null);
+      return;
+    }
+    
+    try {
+      await deletePost(selectedPost.id);
+      console.log('Delete successful, closing modal');
+      setDeleteModalOpen(false);
+      setSelectedPost(null);
+    } catch (error) {
+      console.error('Error in handleConfirmDelete:', error);
+      toast.error('Failed to delete post');
+    }
   };
 
   const handleConfirmEdit = async (updatedData) => {
-    await updatePost(selectedPost.id, updatedData);
-    setEditModalOpen(false);
-    setSelectedPost(null);
+    if (selectedPost) {
+      await updatePost(selectedPost.id, updatedData);
+      setEditModalOpen(false);
+      setSelectedPost(null);
+    }
   };
 
   const handleCreatePost = async (postData) => {
     if (!navigator.onLine) {
-      // Save offline
-      const offlinePost = await offlineStorage.savePost({
+      await offlineStorage.savePost({
         ...postData,
-        userId: user.id,
-        username: user.username
+        userId: user?.id,
+        username: user?.username
       });
       toast.success('📱 Post saved offline! Will sync when online.');
     } else {
-      // Post online
       createPost(postData);
     }
   };
@@ -175,7 +198,6 @@ function AppContent() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
-      {/* Status bar */}
       <div className={`fixed top-0 left-0 right-0 z-50 text-center text-xs py-1 
                     ${onlineStatus 
                       ? 'bg-green-500 text-white' 
@@ -195,7 +217,6 @@ function AppContent() {
       />
       
       <Container>
-        {/* Offline banner */}
         {!onlineStatus && (
           <div className="mb-4 p-4 bg-yellow-100 dark:bg-yellow-900/30 
                         border border-yellow-300 dark:border-yellow-700 rounded-lg">
@@ -206,8 +227,7 @@ function AppContent() {
           </div>
         )}
 
-        {/* Post creation form */}
-        {user && (
+        {isAuthenticated && user && (
           <div className="mb-8">
             <div className="flex gap-2 mb-2">
               <button
@@ -233,7 +253,6 @@ function AppContent() {
           </div>
         )}
 
-        {/* Posts list with virtualization */}
         {postsLoading ? (
           <div className="flex justify-center py-12">
             <LoadingSpinner size="lg" color="blue" />
@@ -251,11 +270,10 @@ function AppContent() {
             onUpdateComment={updateComment}
             isAddingComment={isAddingComment}
             selectedIndex={selectedIndex}
-            expandedComments={expandedComments} // Pass expanded comments state
+            expandedComments={expandedComments}
           />
         )}
 
-        {/* Real-time activity indicator */}
         {realtimeMessages.length > 0 && (
           <div className="fixed bottom-4 right-4 z-40">
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-3 
@@ -271,10 +289,10 @@ function AppContent() {
         )}
       </Container>
 
-      {/* Modals */}
       <DeleteConfirmModal
         isOpen={deleteModalOpen}
         onClose={() => {
+          console.log('Closing delete modal');
           setDeleteModalOpen(false);
           setSelectedPost(null);
         }}
@@ -293,7 +311,6 @@ function AppContent() {
         isUpdating={isUpdating}
       />
 
-      {/* Toast notifications */}
       <Toaster
         position={isMobile ? 'top-center' : 'bottom-right'}
         toastOptions={{
@@ -306,18 +323,9 @@ function AppContent() {
               ? '#f3f4f6'
               : '#111827',
           },
-          success: {
-            duration: 3000,
-            icon: '✅',
-          },
-          error: {
-            duration: 4000,
-            icon: '❌',
-          },
         }}
       />
 
-      {/* Keyboard shortcuts help (hidden by default) */}
       <div className="fixed bottom-4 left-4 z-40">
         <button
           onClick={() => {
@@ -332,9 +340,9 @@ function AppContent() {
               { duration: 8000 }
             );
           }}
-          className="bg-gray-800 dark:bg-gray-700 text-white p-2 rounded-full 
+          className="bg-gray-800 dark:bg-gray-700 text-white p-3 rounded-full 
                    hover:bg-gray-700 dark:hover:bg-gray-600 transition-colors
-                   shadow-lg"
+                   shadow-lg text-lg"
           title="Keyboard shortcuts"
         >
           ⌨️
@@ -347,9 +355,11 @@ function AppContent() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <AppContent />
-      </ThemeProvider>
+      <AuthProvider>
+        <ThemeProvider>
+          <AppContent />
+        </ThemeProvider>
+      </AuthProvider>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );

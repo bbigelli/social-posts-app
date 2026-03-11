@@ -14,27 +14,23 @@ const VirtualizedPostList = ({
   onUpdateComment,
   isAddingComment,
   selectedIndex = -1,
-  expandedComments // New prop to track expanded comments
+  expandedComments = {}
 }) => {
   const parentRef = useRef();
 
-  // Dynamic size estimation based on whether comments are expanded
   const estimateSize = (index) => {
     const post = posts[index];
-    // Base size for post content
-    let baseSize = 300; // Base height for title, body, actions
+    let baseSize = 300;
     
-    // Add space for image if present
     if (post?.media) {
-      baseSize += 300; // Approximate image height
+      baseSize += 300;
     }
     
-    // Add space for comments section if expanded
-    if (expandedComments?.[post?.id]) {
+    if (expandedComments[post?.id]) {
       const commentCount = post?.comments?.length || 0;
-      baseSize += 100; // Header for comments section
-      baseSize += commentCount * 70; // Each comment takes about 70px
-      baseSize += 60; // Comment input form
+      baseSize += 100;
+      baseSize += commentCount * 70;
+      baseSize += 60;
     }
     
     return baseSize;
@@ -44,17 +40,15 @@ const VirtualizedPostList = ({
     count: posts.length,
     getScrollElement: () => parentRef.current,
     estimateSize,
-    overscan: 2, // Reduced overscan for better performance
+    overscan: 2,
   });
 
-  // Scroll to selected post when using keyboard navigation
   useEffect(() => {
     if (selectedIndex >= 0 && virtualizer) {
       virtualizer.scrollToIndex(selectedIndex, { align: 'center' });
     }
   }, [selectedIndex, virtualizer]);
 
-  // Force virtualizer to recalculate when comments expand/collapse
   useEffect(() => {
     virtualizer?.measure();
   }, [expandedComments, virtualizer]);
@@ -72,7 +66,7 @@ const VirtualizedPostList = ({
       ref={parentRef}
       className="w-full overflow-auto"
       style={{
-        height: 'calc(100vh - 200px)',
+        height: 'calc(100vh - 250px)',
         position: 'relative',
       }}
     >
@@ -97,7 +91,7 @@ const VirtualizedPostList = ({
                 left: 0,
                 width: '100%',
                 transform: `translateY(${virtualRow.start}px)`,
-                padding: '0 4px', // Add small padding to prevent overlap
+                padding: '0 4px',
               }}
               className={`${isSelected ? 'ring-2 ring-blue-500 ring-opacity-50 rounded-lg' : ''}`}
             >

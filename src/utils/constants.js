@@ -8,4 +8,4 @@ export const SORT_OPTIONS = [
 ];
 
 export const THEME_STORAGE_KEY = 'theme-preference';
-export const USER_STORAGE_KEY = 'current-user';
+export const USER_STORAGE_KEY = 'social-posts-user';

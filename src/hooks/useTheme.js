@@ -1,7 +1,3 @@
-/**
- * Custom hook for theme management
- * Hook personalizado para gerenciamento de tema
- */
 import { useContext } from 'react';
 import { ThemeContext } from '../context/ThemeContext';
 

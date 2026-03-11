@@ -13,14 +13,12 @@ import {
 const RichTextEditor = ({ value, onChange, placeholder = "Write something..." }) => {
   const editorRef = useRef();
 
-  // Execute editor command
   const execCommand = (command, value = null) => {
     document.execCommand(command, false, value);
     editorRef.current.focus();
     onChange(editorRef.current.innerHTML);
   };
 
-  // Handle paste to clean formatting
   const handlePaste = (e) => {
     e.preventDefault();
     const text = e.clipboardData.getData('text/plain');
@@ -29,7 +27,6 @@ const RichTextEditor = ({ value, onChange, placeholder = "Write something..." })
 
   return (
     <div className="border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden">
-      {/* Toolbar */}
       <div className="flex flex-wrap gap-1 p-2 border-b bg-gray-50 dark:bg-gray-800">
         <button
           onClick={() => execCommand('bold')}
@@ -119,7 +116,6 @@ const RichTextEditor = ({ value, onChange, placeholder = "Write something..." })
         </button>
       </div>
 
-      {/* Editor */}
       <div
         ref={editorRef}
         contentEditable

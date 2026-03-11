@@ -2,7 +2,6 @@ import axios from 'axios';
 import { API_BASE_URL } from '../utils/constants';
 import { generateId } from '../utils/helpers';
 
-// Simulated backend service / Serviço de backend simulado
 class ApiService {
   constructor() {
     this.posts = [];
@@ -10,10 +9,8 @@ class ApiService {
   }
 
   async initializePosts() {
-    // Fetch initial posts from JSONPlaceholder / Buscar posts iniciais do JSONPlaceholder
     try {
       const response = await axios.get(`${API_BASE_URL}/posts?_limit=10`);
-      
       
       const englishTitles = [
         "My Journey with React",
@@ -42,10 +39,10 @@ class ApiService {
       ];
 
       this.posts = response.data.map((post, index) => ({
-        id: post.id.toString(), // Ensure ID is string
+        id: post.id.toString(),
         title: englishTitles[index % englishTitles.length],
         body: englishBodies[index % englishBodies.length],
-        userId: post.userId.toString(), // Ensure userId is string
+        userId: post.userId.toString(),
         createdAt: new Date(Date.now() - Math.random() * 10000000000).toISOString(),
         likes: Math.floor(Math.random() * 100),
         comments: Array(Math.floor(Math.random() * 3)).fill(null).map(() => ({
@@ -58,13 +55,12 @@ class ApiService {
         media: Math.random() > 0.7 ? `https://picsum.photos/400/300?random=${post.id}` : null
       }));
       
-      console.log('Initialized posts:', this.posts.length); // Debug log
+      console.log('Initialized posts:', this.posts.length);
     } catch (error) {
       console.error('Failed to initialize posts:', error);
     }
   }
 
-  // Helper method to get random comments / Método auxiliar para comentários aleatórios
   getRandomComment() {
     const comments = [
       "Great post! Thanks for sharing.",
@@ -82,7 +78,6 @@ class ApiService {
   }
 
   async getPosts() {
-    // Simulate network delay / Simular delay de rede
     await new Promise(resolve => setTimeout(resolve, 500));
     return this.posts;
   }
@@ -99,7 +94,7 @@ class ApiService {
     };
     
     this.posts = [newPost, ...this.posts];
-    console.log('Post created:', newPost); // Debug log
+    console.log('Post created:', newPost);
     return newPost;
   }
 
@@ -110,36 +105,32 @@ class ApiService {
     if (index === -1) throw new Error('Post not found');
     
     this.posts[index] = { ...this.posts[index], ...updatedData };
-    console.log('Post updated:', this.posts[index]); // Debug log
+    console.log('Post updated:', this.posts[index]);
     return this.posts[index];
   }
 
-  // DELETE POST METHOD
   async deletePost(id) {
-    console.log('API deletePost called with ID:', id); // Debug log
+    console.log('API deletePost called with ID:', id);
     
     await new Promise(resolve => setTimeout(resolve, 500));
     
-    // Find the post index
     const index = this.posts.findIndex(post => post.id === id);
-    console.log('Found post at index:', index); // Debug log
+    console.log('Found post at index:', index);
     
     if (index === -1) {
       console.error('Post not found with ID:', id);
       throw new Error('Post not found');
     }
     
-    // Remove the post from the array
     const deletedPost = this.posts[index];
     this.posts.splice(index, 1);
     
-    console.log('Post deleted successfully:', deletedPost); // Debug log
-    console.log('Remaining posts:', this.posts.length); // Debug log
+    console.log('Post deleted successfully:', deletedPost);
+    console.log('Remaining posts:', this.posts.length);
     
     return { success: true, deletedPost };
   }
 
-  // Add comment to post / Adicionar comentário ao post
   async addComment(postId, commentData) {
     await new Promise(resolve => setTimeout(resolve, 500));
     
@@ -157,11 +148,10 @@ class ApiService {
     }
     
     this.posts[index].comments.push(newComment);
-    console.log('Comment added:', newComment); // Debug log
+    console.log('Comment added:', newComment);
     return newComment;
   }
 
-  // Delete comment from post / Deletar comentário do post
   async deleteComment(postId, commentId) {
     await new Promise(resolve => setTimeout(resolve, 500));
     
@@ -172,11 +162,10 @@ class ApiService {
     if (commentIndex === -1) throw new Error('Comment not found');
     
     this.posts[postIndex].comments.splice(commentIndex, 1);
-    console.log('Comment deleted:', commentId); // Debug log
+    console.log('Comment deleted:', commentId);
     return { success: true };
   }
 
-  // Update comment / Editar comentário
   async updateComment(postId, commentId, updatedText) {
     await new Promise(resolve => setTimeout(resolve, 500));
     
@@ -189,7 +178,7 @@ class ApiService {
     this.posts[postIndex].comments[commentIndex].text = updatedText;
     this.posts[postIndex].comments[commentIndex].editedAt = new Date().toISOString();
     
-    console.log('Comment updated:', commentId); // Debug log
+    console.log('Comment updated:', commentId);
     return this.posts[postIndex].comments[commentIndex];
   }
 }

@@ -11,7 +11,6 @@ const PostList = ({
   onLike, 
   likedPosts,
   currentUser,
-  // NOVAS PROPS
   onAddComment,
   onDeleteComment,
   onUpdateComment,
